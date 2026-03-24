@@ -55,7 +55,7 @@ export default function Page() {
   const manifestoY = useTransform(manifestoProgress, [0, 1], ["20%", "-20%"]);
 
   return (
-    <main ref={containerRef} className="min-h-screen selection:bg-accent selection:text-ink">
+    <main ref={containerRef} className="min-h-screen selection:bg-accent selection:text-ink pt-24 md:pt-28">
       
       {/* Video Modal */}
       <AnimatePresence>

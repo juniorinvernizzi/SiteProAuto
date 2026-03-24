@@ -45,13 +45,14 @@ export default function Header() {
     { name: t.nav.products, href: '/products' },
     { name: t.menu.buyOnline, href: '/buy-online' },
     { name: t.nav.contact, href: '/contact' },
+    { name: t.revendedor.navBtn, href: '/seja-um-revendedor', highlight: true },
   ];
 
   return (
     <>
       <nav className="fixed top-0 left-0 w-full z-40 p-4 md:p-6 flex justify-between items-center bg-black/20 backdrop-blur-md border-b border-white/10 text-white">
         <Link href="/" className="cursor-pointer flex items-center">
-          <Image src="/logo.svg" alt="Proauto Logo" width={160} height={50} className="object-contain" />
+          <Image src="/logo.svg" alt="Proauto Logo" width={120} height={38} className="object-contain" />
         </Link>
         <div className="hidden md:flex gap-12 text-xs font-bold tracking-[0.2em] uppercase items-center">
           <Link href="/brand" className="hover:text-accent transition-colors">{t.nav.brand}</Link>
@@ -60,6 +61,12 @@ export default function Header() {
           <div className="w-px h-4 bg-white/20" />
           <LanguageSelector />
         </div>
+        <Link
+          href="/seja-um-revendedor"
+          className="mr-[30px] bg-accent text-white px-4 py-2.5 text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-white hover:text-ink transition-colors whitespace-nowrap"
+        >
+          {t.revendedor.navBtn}
+        </Link>
         <button 
           onClick={() => setIsMenuOpen(true)}
           className="flex items-center justify-center group p-2"
@@ -132,7 +139,9 @@ export default function Header() {
                       <Link 
                         href={item.href}
                         onClick={() => setIsMenuOpen(false)}
-                        className="font-display text-5xl md:text-7xl uppercase hover:text-accent transition-colors w-fit block relative group"
+                        className={`font-display text-5xl md:text-7xl uppercase transition-colors w-fit block relative group ${
+                          item.highlight ? 'text-accent hover:text-ink' : 'hover:text-accent'
+                        }`}
                       >
                         {item.name}
                         <motion.div 
