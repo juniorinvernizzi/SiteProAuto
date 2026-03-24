@@ -5,7 +5,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, Play, Plus, MoveRight, X } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
-import { translations, Language } from './translations';
+import { translations } from './translations';
+import { useLanguage } from './contexts/LanguageContext';
 
 // Custom easing for premium feel
 const customEase = cubicBezier(0.16, 1, 0.3, 1);
@@ -26,7 +27,7 @@ const RevealText = ({ text, delay = 0, className = "" }: { text: string, delay?:
 };
 
 export default function Page() {
-  const [lang, setLang] = useState<Language>('pt');
+  const { lang } = useLanguage();
   const t = translations[lang];
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);

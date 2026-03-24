@@ -1,9 +1,10 @@
 'use client';
 
-import { translations, Language } from '@/app/translations';
-import { use, useState, useRef, useEffect } from 'react';
+import { translations } from '@/app/translations';
+import { useState, useRef, useEffect } from 'react';
+import { useLanguage } from '@/app/contexts/LanguageContext';
 import Image from 'next/image';
-import { motion } from 'motion/react';
+import { motion, useMotionValue, animate as animateValue } from 'motion/react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 const GALLERY_IMAGES = [
@@ -14,15 +15,15 @@ const GALLERY_IMAGES = [
   "https://images.unsplash.com/photo-1610647752706-3bb12232b3ab?auto=format&fit=crop&q=80"
 ];
 
-export default function BrandPage({ searchParams }: { searchParams: Promise<{ lang?: string }> }) {
-  const { lang } = use(searchParams);
-  const currentLang = (lang as Language) || 'pt';
+export default function BrandPage() {
+  const { lang: currentLang } = useLanguage();
   const t = translations[currentLang];
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const xMotion = useMotionValue(0);
 
   useEffect(() => {
     if (carouselRef.current) {
@@ -30,15 +31,31 @@ export default function BrandPage({ searchParams }: { searchParams: Promise<{ la
     }
   }, []);
 
+  const animateXPosition = (index: number) => {
+    if (!carouselRef.current) return;
+    const draggable = carouselRef.current.firstElementChild as HTMLElement;
+    if (!draggable) return;
+    const children = draggable.children;
+    let offset = 0;
+    for (let i = 0; i < index; i++) {
+      offset += (children[i] as HTMLElement).offsetWidth + 32; // 2rem gap
+    }
+    animateValue(xMotion, -offset, { type: 'spring', stiffness: 300, damping: 30 });
+  };
+
   const handleNext = () => {
     if (currentIndex < GALLERY_IMAGES.length - 1) {
-      setCurrentIndex(prev => prev + 1);
+      const next = currentIndex + 1;
+      setCurrentIndex(next);
+      animateXPosition(next);
     }
   };
 
   const handlePrev = () => {
     if (currentIndex > 0) {
-      setCurrentIndex(prev => prev - 1);
+      const prev = currentIndex - 1;
+      setCurrentIndex(prev);
+      animateXPosition(prev);
     }
   };
 
@@ -54,10 +71,10 @@ export default function BrandPage({ searchParams }: { searchParams: Promise<{ la
             className="max-w-4xl"
           >
             <h1 className="font-display text-6xl md:text-8xl lg:text-[120px] leading-[0.85] uppercase tracking-tighter mb-8">
-              A MARCA<br/><span className="text-accent">PROAUTO</span>
+              {t.brand.title}<br/><span className="text-accent">{t.brand.titleAccent}</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-400 font-light leading-relaxed max-w-2xl">
-              Desde 2005, redefinindo os padrões de estética automotiva no Brasil com tecnologia de ponta e paixão por performance.
+              {t.brand.heroText}
             </p>
           </motion.div>
         </section>
@@ -84,30 +101,20 @@ export default function BrandPage({ searchParams }: { searchParams: Promise<{ la
             viewport={{ once: true }}
             className="flex flex-col gap-8"
           >
-            <h2 className="font-display text-4xl md:text-5xl uppercase">Nossa História</h2>
+            <h2 className="font-display text-4xl md:text-5xl uppercase">{t.brand.historyTitle}</h2>
             <div className="flex flex-col gap-6 text-gray-400 leading-relaxed">
-              <p>
-                Nascida da paixão por carros e da busca incessante pela perfeição, a Proauto começou como um pequeno laboratório focado em desenvolver a cera perfeita.
-              </p>
-              <p>
-                Hoje, somos a marca líder em produtos de alta performance para estética automotiva, presentes em milhares de lares e estúdios de detalhamento profissional em todo o país.
-              </p>
-              <p>
-                Nossa missão é simples: fornecer os melhores produtos para que você possa cuidar do seu veículo com o mesmo nível de exigência de um profissional.
-              </p>
+              <p>{t.brand.historyP1}</p>
+              <p>{t.brand.historyP2}</p>
+              <p>{t.brand.historyP3}</p>
             </div>
           </motion.div>
         </section>
 
         {/* Values */}
         <section className="mb-32">
-          <h2 className="font-display text-4xl md:text-5xl uppercase mb-16 text-center">Nossos Pilares</h2>
+          <h2 className="font-display text-4xl md:text-5xl uppercase mb-16 text-center">{t.brand.valuesTitle}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { title: "Inovação", desc: "Investimento contínuo em P&D para criar fórmulas exclusivas e mais eficientes." },
-              { title: "Performance", desc: "Produtos testados em condições extremas para garantir resultados superiores." },
-              { title: "Sustentabilidade", desc: "Compromisso com o meio ambiente através de embalagens recicláveis e fórmulas biodegradáveis." }
-            ].map((item, i) => (
+            {t.brand.values.map((item, i) => (
               <motion.div 
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
@@ -129,7 +136,7 @@ export default function BrandPage({ searchParams }: { searchParams: Promise<{ la
       {/* Photo Gallery Carousel */}
       <section className="py-24 bg-surface border-y border-white/10 overflow-hidden">
         <div className="container mx-auto px-6 mb-16 flex justify-between items-end">
-          <h2 className="font-display text-4xl md:text-6xl uppercase tracking-tight">Galeria</h2>
+          <h2 className="font-display text-4xl md:text-6xl uppercase tracking-tight">{t.brand.galleryTitle}</h2>
           
           <div className="flex gap-4">
             <button 
@@ -164,16 +171,17 @@ export default function BrandPage({ searchParams }: { searchParams: Promise<{ la
               onDragStart={() => setIsDragging(true)}
               onDragEnd={(e, info) => {
                 setTimeout(() => setIsDragging(false), 100);
+                let next = currentIndex;
                 if (info.offset.x < -50 && currentIndex < GALLERY_IMAGES.length - 1) {
-                  setCurrentIndex(prev => prev + 1);
+                  next = currentIndex + 1;
                 } else if (info.offset.x > 50 && currentIndex > 0) {
-                  setCurrentIndex(prev => prev - 1);
+                  next = currentIndex - 1;
                 }
+                setCurrentIndex(next);
+                animateXPosition(next);
               }}
-              animate={{ x: `calc(-${currentIndex * 100}% - ${currentIndex * 2}rem + 50vw - 40vw)` }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="flex gap-8 px-[50vw] md:px-[50vw]"
-              style={{ marginLeft: '-40vw' }} // Adjust to center the 80vw item
+              style={{ x: xMotion }}
+              className="flex gap-8 px-6 md:px-8"
             >
               {GALLERY_IMAGES.map((img, idx) => (
                 <motion.div 

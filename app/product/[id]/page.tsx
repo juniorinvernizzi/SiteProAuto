@@ -1,17 +1,17 @@
 'use client';
 
 import { products } from '@/app/data/products';
-import { translations, Language } from '@/app/translations';
+import { translations } from '@/app/translations';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, Play, Info, Layers, FileText, CheckCircle2 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { use, useState } from 'react';
+import { useLanguage } from '@/app/contexts/LanguageContext';
 
-export default function ProductPage({ params, searchParams }: { params: Promise<{ id: string }>, searchParams: Promise<{ lang?: string }> }) {
+export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { lang } = use(searchParams);
-  const currentLang = (lang as Language) || 'pt';
+  const { lang: currentLang } = useLanguage();
   const t = translations[currentLang];
 
   const product = products.find(p => p.id === id);
@@ -28,7 +28,7 @@ export default function ProductPage({ params, searchParams }: { params: Promise<
   return (
     <main className="min-h-screen text-white font-sans selection:bg-accent selection:text-ink pt-32 overflow-hidden">
       <div className="container mx-auto px-6">
-        <Link href={`/category/${product.categoryId}?lang=${currentLang}`} className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-12 uppercase tracking-widest text-xs font-bold">
+        <Link href={`/category/${product.categoryId}`} className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-12 uppercase tracking-widest text-xs font-bold">
           <ArrowLeft size={16} />
           {t.product.back}
         </Link>
@@ -128,7 +128,7 @@ export default function ProductPage({ params, searchParams }: { params: Promise<
                 {t.product.downloadTechSheet}
               </button>
 
-              <Link href={`/buy-online?lang=${currentLang}`} className="mt-4 w-full py-4 rounded-xl bg-white text-ink hover:bg-accent border border-white text-sm font-bold tracking-widest uppercase transition-all duration-300 flex items-center justify-center gap-3 group">
+              <Link href="/buy-online" className="mt-4 w-full py-4 rounded-xl bg-white text-ink hover:bg-accent border border-white text-sm font-bold tracking-widest uppercase transition-all duration-300 flex items-center justify-center gap-3 group">
                 {t.menu.buyOnline}
               </Link>
             </div>

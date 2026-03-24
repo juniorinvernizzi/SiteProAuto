@@ -5,18 +5,46 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
 import { X } from 'lucide-react';
+import { useLanguage } from '@/app/contexts/LanguageContext';
+import { translations, Language } from '@/app/translations';
 
 const customEase = [0.16, 1, 0.3, 1] as const;
 
+const LANGUAGES: { code: Language; label: string }[] = [
+  { code: 'pt', label: 'PT' },
+  { code: 'en', label: 'EN' },
+  { code: 'es', label: 'ES' },
+];
+
+function LanguageSelector({ onSelect }: { onSelect?: () => void }) {
+  const { lang, setLang } = useLanguage();
+  return (
+    <div className="flex items-center gap-1 text-xs font-bold tracking-[0.2em]">
+      {LANGUAGES.map((l, i) => (
+        <span key={l.code} className="flex items-center gap-1">
+          {i > 0 && <span className="opacity-30">|</span>}
+          <button
+            onClick={() => { setLang(l.code); onSelect?.(); }}
+            className={`transition-colors px-0.5 ${lang === l.code ? 'text-accent' : 'text-white/50 hover:text-white'}`}
+          >
+            {l.label}
+          </button>
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { lang, setLang } = useLanguage();
+  const t = translations[lang];
 
-  // Links that actually exist
   const menuLinks = [
-    { name: 'A Marca', href: '/brand' },
-    { name: 'Produtos', href: '/products' },
-    { name: 'Compre Online', href: '/buy-online' },
-    { name: 'Contato', href: '/contact' },
+    { name: t.nav.brand, href: '/brand' },
+    { name: t.nav.products, href: '/products' },
+    { name: t.menu.buyOnline, href: '/buy-online' },
+    { name: t.nav.contact, href: '/contact' },
   ];
 
   return (
@@ -26,9 +54,11 @@ export default function Header() {
           <Image src="/logo.svg" alt="Proauto Logo" width={160} height={50} className="object-contain" />
         </Link>
         <div className="hidden md:flex gap-12 text-xs font-bold tracking-[0.2em] uppercase items-center">
-          <Link href="/brand" className="hover:text-accent transition-colors">A Marca</Link>
-          <Link href="/products" className="hover:text-accent transition-colors">Produtos</Link>
-          <Link href="/contact" className="hover:text-accent transition-colors">Contato</Link>
+          <Link href="/brand" className="hover:text-accent transition-colors">{t.nav.brand}</Link>
+          <Link href="/products" className="hover:text-accent transition-colors">{t.nav.products}</Link>
+          <Link href="/contact" className="hover:text-accent transition-colors">{t.nav.contact}</Link>
+          <div className="w-px h-4 bg-white/20" />
+          <LanguageSelector />
         </div>
         <button 
           onClick={() => setIsMenuOpen(true)}
@@ -105,7 +135,6 @@ export default function Header() {
                         className="font-display text-5xl md:text-7xl uppercase hover:text-accent transition-colors w-fit block relative group"
                       >
                         {item.name}
-                        {/* Overlay effect on click */}
                         <motion.div 
                           className="absolute inset-0 bg-accent origin-left z-[-1]"
                           initial={{ scaleX: 0 }}
@@ -122,9 +151,25 @@ export default function Header() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8, duration: 0.5 }}
-                className="mt-24 flex flex-col md:flex-row gap-12 text-sm font-bold tracking-[0.1em] uppercase text-gray-500"
+                className="mt-16 flex flex-col md:flex-row gap-8 items-start md:items-end justify-between"
               >
-                <div className="flex flex-col gap-2 md:ml-auto md:text-right text-xs leading-relaxed">
+                {/* Language Selector in Menu */}
+                <div className="flex flex-col gap-2">
+                  <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-gray-400">Idioma / Language</p>
+                  <div className="flex items-center gap-3">
+                    {LANGUAGES.map((l) => (
+                      <button
+                        key={l.code}
+                        onClick={() => setLang(l.code)}
+                        className={`text-sm font-bold tracking-[0.2em] uppercase transition-all px-3 py-1.5 border ${lang === l.code ? 'border-ink bg-ink text-white' : 'border-ink/20 text-ink/40 hover:border-ink/60 hover:text-ink'}`}
+                      >
+                        {l.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2 md:text-right text-xs leading-relaxed text-gray-500">
                   <p>Proauto Premium Brasil</p>
                   <p>Av. das Nações Unidas, 14401</p>
                   <p>São Paulo, SP</p>

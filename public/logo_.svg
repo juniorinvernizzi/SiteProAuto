@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 160">
+  <defs>
+    <clipPath id="rc">
+      <rect x="0" y="0" width="500" height="160" rx="25" />
+    </clipPath>
+  </defs>
+  <g clip-path="url(#rc)">
+    <!-- Backgrounds -->
+    <rect x="0" y="0" width="500" height="75" fill="#E3000F" />
+    <rect x="0" y="75" width="500" height="85" fill="#000000" />
+    
+    <!-- White Road -->
+    <path d="M 40 75 C 150 75, 200 20, 240 0 L 280 0 C 300 20, 380 75, 500 75 Z" fill="#FFFFFF" />
+    
+    <!-- Red Center Stripe -->
+    <path d="M 220 75 C 235 50, 250 20, 270 0 L 240 0 C 220 20, 200 50, 180 75 Z" fill="#E3000F" />
+    
+    <!-- PROAUTO Text -->
+    <text x="238" y="142" font-family="Arial, sans-serif" font-size="72" font-weight="900" font-style="italic" fill="#FFF200" text-anchor="middle" letter-spacing="2" transform="scale(1.05, 1)">PROAUTO</text>
+    
+    <!-- Registered Trademark -->
+    <text x="475" y="105" font-family="Arial, sans-serif" font-size="16" fill="#A0A0A0">®</text>
+  </g>
+</svg>

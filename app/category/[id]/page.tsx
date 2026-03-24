@@ -1,17 +1,17 @@
 'use client';
 
 import { products } from '@/app/data/products';
-import { translations, Language } from '@/app/translations';
+import { translations } from '@/app/translations';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, MoveRight } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion, useMotionValue, animate as animateValue } from 'motion/react';
 import { use, useRef, useState, useEffect } from 'react';
+import { useLanguage } from '@/app/contexts/LanguageContext';
 
-export default function CategoryPage({ params, searchParams }: { params: Promise<{ id: string }>, searchParams: Promise<{ lang?: string }> }) {
+export default function CategoryPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { lang } = use(searchParams);
-  const currentLang = (lang as Language) || 'pt';
+  const { lang: currentLang } = useLanguage();
   const t = translations[currentLang];
 
   // Find category info from translations
@@ -22,6 +22,7 @@ export default function CategoryPage({ params, searchParams }: { params: Promise
   const [width, setWidth] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const xMotion = useMotionValue(0);
 
   useEffect(() => {
     if (carouselRef.current) {
@@ -29,15 +30,31 @@ export default function CategoryPage({ params, searchParams }: { params: Promise
     }
   }, [categoryProducts]);
 
+  const animateXPosition = (index: number) => {
+    if (!carouselRef.current) return;
+    const draggable = carouselRef.current.firstElementChild as HTMLElement;
+    if (!draggable) return;
+    const children = draggable.children;
+    let offset = 0;
+    for (let i = 0; i < index; i++) {
+      offset += (children[i] as HTMLElement).offsetWidth + 32; // 2rem gap-8
+    }
+    animateValue(xMotion, -offset, { type: 'spring', stiffness: 300, damping: 30 });
+  };
+
   const handleNext = () => {
     if (currentIndex < categoryProducts.length - 1) {
-      setCurrentIndex(prev => prev + 1);
+      const next = currentIndex + 1;
+      setCurrentIndex(next);
+      animateXPosition(next);
     }
   };
 
   const handlePrev = () => {
     if (currentIndex > 0) {
-      setCurrentIndex(prev => prev - 1);
+      const prev = currentIndex - 1;
+      setCurrentIndex(prev);
+      animateXPosition(prev);
     }
   };
 
@@ -48,9 +65,9 @@ export default function CategoryPage({ params, searchParams }: { params: Promise
   return (
     <main className="min-h-screen text-white font-sans selection:bg-accent selection:text-ink pt-32 overflow-hidden">
       <div className="container mx-auto px-6">
-        <Link href={`/?lang=${currentLang}`} className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-12 uppercase tracking-widest text-xs font-bold">
+        <Link href="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-12 uppercase tracking-widest text-xs font-bold">
           <ArrowLeft size={16} />
-          Voltar
+          {t.product.back}
         </Link>
         
         <header className="mb-16">
@@ -79,7 +96,7 @@ export default function CategoryPage({ params, searchParams }: { params: Promise
           className="flex items-center justify-between mb-8"
         >
           <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-white/40">
-            <span>Arraste ou use as setas</span>
+            <span>{t.category.dragHint}</span>
           </div>
           
           <div className="flex items-center gap-6">
@@ -128,16 +145,16 @@ export default function CategoryPage({ params, searchParams }: { params: Promise
             onDragStart={() => setIsDragging(true)}
             onDragEnd={(e, info) => {
               setTimeout(() => setIsDragging(false), 100);
-              // Snap to nearest item based on drag velocity/offset
-              const itemWidth = carouselRef.current ? carouselRef.current.offsetWidth * 0.8 : 300; // approximate
+              let next = currentIndex;
               if (info.offset.x < -50 && currentIndex < categoryProducts.length - 1) {
-                setCurrentIndex(prev => prev + 1);
+                next = currentIndex + 1;
               } else if (info.offset.x > 50 && currentIndex > 0) {
-                setCurrentIndex(prev => prev - 1);
+                next = currentIndex - 1;
               }
+              setCurrentIndex(next);
+              animateXPosition(next);
             }}
-            animate={{ x: `calc(-${currentIndex * 100}% - ${currentIndex * 2}rem)` }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            style={{ x: xMotion }}
             className="flex gap-8 px-6 md:px-24"
           >
             {categoryProducts.map((product, idx) => {
@@ -151,7 +168,7 @@ export default function CategoryPage({ params, searchParams }: { params: Promise
                   className="min-w-[85vw] md:min-w-[400px] flex-shrink-0"
                 >
                   <Link 
-                    href={`/product/${product.id}?lang=${currentLang}`} 
+                    href={`/product/${product.id}`} 
                     className="group flex flex-col h-full relative"
                     onClick={(e) => {
                       if (isDragging) e.preventDefault();
