@@ -1,3 +1,11 @@
+function formatCnpj(raw: string): string {
+  const digits = raw.replace(/\D/g, '').slice(0, 14);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 5) return `${digits.slice(0, 2)}.${digits.slice(2)}`;
+  if (digits.length <= 8) return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5)}`;
+  if (digits.length <= 12) return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5, 8)}/${digits.slice(8)}`;
+  return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5, 8)}/${digits.slice(8, 12)}-${digits.slice(12)}`;
+}
 'use client';
 
 import { useState } from 'react';
@@ -30,6 +38,10 @@ export default function SejaUmRevendedorPage() {
   const [name, setName] = useState('');
   const [company, setCompany] = useState('');
   const [cnpj, setCnpj] = useState('');
+
+  const handleCnpj = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCnpj(formatCnpj(e.target.value));
+  };
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [city, setCity] = useState('');
@@ -204,8 +216,10 @@ export default function SejaUmRevendedorPage() {
                       <input
                         type="text"
                         value={cnpj}
-                        onChange={e => setCnpj(e.target.value)}
+                        onChange={handleCnpj}
                         placeholder={r.cnpjPlaceholder}
+                        inputMode="numeric"
+                        maxLength={18}
                         className={inputClass}
                       />
                     </div>
