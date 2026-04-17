@@ -1,3 +1,4 @@
+'export const runtime = 'edge';
 'use client';
 
 import { products } from '@/app/data/products';
