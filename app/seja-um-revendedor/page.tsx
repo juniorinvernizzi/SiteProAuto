@@ -27,38 +27,38 @@ function formatPhone(raw: string): string {
   } else if (digits.length > 0) {
     return `(${digits}`;
   }
-  return '';
-}
 
-export default function SejaUmRevendedorPage() {
-  const { lang } = useLanguage();
-  const t = translations[lang];
-  const r = t.revendedor;
+  'use client';
+  import { useState } from 'react';
+  import { translations } from '@/app/translations';
+  import { useLanguage } from '@/app/contexts/LanguageContext';
+  import Link from 'next/link';
+  import { ArrowLeft, ArrowRight, ShieldCheck, TrendingUp, Package, CheckCircle2 } from 'lucide-react';
+  import { motion, AnimatePresence } from 'motion/react';
+  import Image from 'next/image';
 
-  const [name, setName] = useState('');
-  const [company, setCompany] = useState('');
-  const [cnpj, setCnpj] = useState('');
+  const customEase = [0.16, 1, 0.3, 1] as const;
 
-  const handleCnpj = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCnpj(formatCnpj(e.target.value));
-  };
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [city, setCity] = useState('');
-  const [segment, setSegment] = useState('');
-  const [message, setMessage] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  function formatPhone(raw: string): string {
+    const digits = raw.replace(/\D/g, '').slice(0, 11);
+    if (digits.length > 6) {
+      return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+    } else if (digits.length > 2) {
+      return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    } else if (digits.length > 0) {
+      return `(${digits}`;
+    }
+    return '';
+  }
 
-  const handlePhone = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPhone(formatPhone(e.target.value));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitted(true);
-  };
-
-  const infoItems = [
+  function formatCnpj(raw: string): string {
+    const digits = raw.replace(/\D/g, '').slice(0, 14);
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 5) return `${digits.slice(0, 2)}.${digits.slice(2)}`;
+    if (digits.length <= 8) return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5)}`;
+    if (digits.length <= 12) return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5, 8)}/${digits.slice(8)}`;
+    return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5, 8)}/${digits.slice(8, 12)}-${digits.slice(12)}`;
+  }
     { Icon: ShieldCheck, title: r.info1Title, text: r.info1Text },
     { Icon: TrendingUp, title: r.info2Title, text: r.info2Text },
     { Icon: Package, title: r.info3Title, text: r.info3Text },
