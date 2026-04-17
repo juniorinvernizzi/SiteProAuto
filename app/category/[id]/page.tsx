@@ -1,5 +1,5 @@
+
 'use client';
-export const runtime = 'edge';
 
 import { products } from '@/app/data/products';
 import { translations } from '@/app/translations';
