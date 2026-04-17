@@ -1,0 +1,14 @@
+name = "siteproauto-nextjs"
+type = "javascript"
+account_id = "1f3073bc69eba62971dbd1d1be2ba66b"
+workers_dev = true
+compatibility_date = "2026-04-17"
+
+[env.production]
+# Substitua pelos valores reais do seu bucket R2
+[[r2_buckets]]
+binding = "NEXT_INC_CACHE_R2_BUCKET"
+bucket_name = "ai-studio-applet-opennext-cache"
+preview_bucket_name = "ai-studio-applet-opennext-cache"
+
+# Outras configurações podem ser adicionadas conforme necessário
