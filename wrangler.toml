@@ -1,13 +1,7 @@
 name = "siteproauto-nextjs"
-account_id = "1f3073bc69eba62971dbd1d1be2ba66b"
-workers_dev = true
+pages_build_output_dir = ".open-next/assets"
 compatibility_date = "2026-04-17"
 compatibility_flags = ["nodejs_compat"]
-main = ".open-next/worker.js"
-pages_build_output_dir = ".open-next/assets"
-
-[assets]
-directory = ".open-next/assets"
 
 [[r2_buckets]]
 binding = "NEXT_INC_CACHE_R2_BUCKET"
