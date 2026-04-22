@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "cf:build": "rmdir /s /q .open-next .vercel\\output 2>nul & opennextjs-cloudflare build & if not exist .open-next\\assets mkdir .open-next\\assets & copy .open-next\\worker.js .open-next\\assets\\_worker.js",
+    "cf:build": "rm -rf .open-next .vercel/output && opennextjs-cloudflare build && mkdir -p .open-next/assets && cp .open-next/worker.js .open-next/assets/_worker.js",
     "deploy": "opennextjs-cloudflare deploy",
     "start": "next start",
     "lint": "eslint .",
